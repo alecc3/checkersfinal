@@ -82,6 +82,14 @@ class MonteCarlo:
 
 
     def rollout(self):
+        def will_promote(move, player):
+            x, y = move[1][0], move[1][1]
+            if player == 1: # black
+                return x == self.board.row-1 # move to last row
+            else:
+                return x == 0
+
+
         def distance_from_center(move):
             # avoid expensive sqrt()
             x,y = move[1][0], move[1][1]
@@ -89,7 +97,7 @@ class MonteCarlo:
             sq = lambda x:x*x
             # distance sqrt ((y2-y1)^2+(x2-x1)^2)
             euclidian = sq(y-center_c)+sq(x-center_r)
-            return euclidian*euclidian
+            return sqrt(euclidian)
         visited_boards = set()
         board_copy = copy.deepcopy(self.board)
 
@@ -237,15 +245,18 @@ class MonteCarlo:
                     # then calculate the number of wins and simulations for each child node
                     wi = 0
                     si = 0
+                    di = 0
                     for player, play in self.plays:
                         if self.opponent[self.player] == player and m[0] == play[0] and m[1] == play[1]:
                             wi = self.wins[(player, play)]
                             si = self.plays[(player, play)]
+                            di = distance_from_center(m)
 
                     # after we got all the variables, calculate the UCT for each child node
                     for p in UCT_moves:
                         if m[0] == p[0] and m[1] == p[1]:
-                            uct = (wi/si) + (self.c * sqrt(log(sp)/si))
+                            dist_heuristic = -di/si
+                            uct = (wi/si) + (self.c * sqrt(log(sp)/si)) + dist_heuristic
                             UCT_moves[p] = uct
 
                 # after we calculated the UCT value for each move, pick the move with the max UCT
