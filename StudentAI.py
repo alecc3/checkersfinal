@@ -82,7 +82,6 @@ class MonteCarlo:
 
 
     def rollout(self):
-<<<<<<< HEAD
         def will_promote(move, player):
             x, y = move[1][0], move[1][1]
             if player == 1: # black
@@ -90,21 +89,13 @@ class MonteCarlo:
             else:
                 return x == 0
 
-=======
->>>>>>> a538d3a8d9b6f4545d5d3f1da3a3defe20e78b82
-
         def distance_from_center(move):
             # avoid expensive sqrt()
             x,y = move[1][0], move[1][1]
             center_r, center_c = self.board.row//2, self.board.col//2
             sq = lambda x:x*x
             # distance sqrt ((y2-y1)^2+(x2-x1)^2)
-<<<<<<< HEAD
-            euclidian = sq(y-center_c)+sq(x-center_r)
-            return sqrt(euclidian)
-=======
             euclidian = sqrt(sq(y-center_c)+sq(x-center_r))
-
             # get the reciprocal of the the euclidian distance
             board_diagonal_radius = sqrt(sq(center_r)+sq(center_c))
             return board_diagonal_radius - euclidian
@@ -123,7 +114,6 @@ class MonteCarlo:
             elif player == 2:   # if player is white
                 return w_after < w_before
 
->>>>>>> a538d3a8d9b6f4545d5d3f1da3a3defe20e78b82
         visited_boards = set()
         board_copy = copy.deepcopy(self.board)
 
@@ -190,11 +180,7 @@ class MonteCarlo:
                     for p in UCT_moves:
                         if m[0] == p[0] and m[1] == p[1]:
                             # calibrate this heuristic
-<<<<<<< HEAD
-                            dist_heuristic = -dist/si
-=======
                             dist_heuristic = dist/si
->>>>>>> a538d3a8d9b6f4545d5d3f1da3a3defe20e78b82
                             uct = (wi/si) + (self.c * sqrt(log(sp)/si)) + dist_heuristic
                             UCT_moves[p] = uct
 
@@ -275,31 +261,18 @@ class MonteCarlo:
                     # then calculate the number of wins and simulations for each child node
                     wi = 0
                     si = 0
-<<<<<<< HEAD
                     di = 0
-=======
 
-                    ## CALCULATE DISTANCE
-                    dist = 0
->>>>>>> a538d3a8d9b6f4545d5d3f1da3a3defe20e78b82
                     for player, play in self.plays:
                         if self.opponent[self.player] == player and m[0] == play[0] and m[1] == play[1]:
                             wi = self.wins[(player, play)]
                             si = self.plays[(player, play)]
-<<<<<<< HEAD
                             di = distance_from_center(m)
-=======
-                            dist = distance_from_center(m)
->>>>>>> a538d3a8d9b6f4545d5d3f1da3a3defe20e78b82
 
                     # after we got all the variables, calculate the UCT for each child node
                     for p in UCT_moves:
                         if m[0] == p[0] and m[1] == p[1]:
-<<<<<<< HEAD
-                            dist_heuristic = -di/si
-=======
                             dist_heuristic = dist / si
->>>>>>> a538d3a8d9b6f4545d5d3f1da3a3defe20e78b82
                             uct = (wi/si) + (self.c * sqrt(log(sp)/si)) + dist_heuristic
                             UCT_moves[p] = uct
 
