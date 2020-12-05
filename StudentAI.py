@@ -89,15 +89,31 @@ class MonteCarlo:
             else:
                 return x == 0
 
-
         def distance_from_center(move):
             # avoid expensive sqrt()
             x,y = move[1][0], move[1][1]
             center_r, center_c = self.board.row//2, self.board.col//2
             sq = lambda x:x*x
             # distance sqrt ((y2-y1)^2+(x2-x1)^2)
-            euclidian = sq(y-center_c)+sq(x-center_r)
-            return sqrt(euclidian)
+            euclidian = sqrt(sq(y-center_c)+sq(x-center_r))
+            # get the reciprocal of the the euclidian distance
+            board_diagonal_radius = sqrt(sq(center_r)+sq(center_c))
+            return board_diagonal_radius - euclidian
+
+        def got_captured(board, player, move):
+            # count the number of pieces before and after the move
+            my_board = board.deepcopy()
+            b_before = my_board.black_count
+            w_before = my_board.white_count
+            my_board.make_move(move, player)
+            b_after = my_board.black_count
+            w_after = my_board.white_count
+
+            if player == 1:     # if player is black
+                return b_after < b_before
+            elif player == 2:   # if player is white
+                return w_after < w_before
+
         visited_boards = set()
         board_copy = copy.deepcopy(self.board)
 
@@ -164,7 +180,7 @@ class MonteCarlo:
                     for p in UCT_moves:
                         if m[0] == p[0] and m[1] == p[1]:
                             # calibrate this heuristic
-                            dist_heuristic = -dist/si
+                            dist_heuristic = dist/si
                             uct = (wi/si) + (self.c * sqrt(log(sp)/si)) + dist_heuristic
                             UCT_moves[p] = uct
 
@@ -246,6 +262,7 @@ class MonteCarlo:
                     wi = 0
                     si = 0
                     di = 0
+
                     for player, play in self.plays:
                         if self.opponent[self.player] == player and m[0] == play[0] and m[1] == play[1]:
                             wi = self.wins[(player, play)]
@@ -255,7 +272,7 @@ class MonteCarlo:
                     # after we got all the variables, calculate the UCT for each child node
                     for p in UCT_moves:
                         if m[0] == p[0] and m[1] == p[1]:
-                            dist_heuristic = -di/si
+                            dist_heuristic = dist / si
                             uct = (wi/si) + (self.c * sqrt(log(sp)/si)) + dist_heuristic
                             UCT_moves[p] = uct
 
